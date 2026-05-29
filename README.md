@@ -2,6 +2,12 @@
 
 Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
+## Installation
+
+```bash
+$ cargo install --git https://github.com/kevinschweikert/proto.git
+```
+
 ## Synopsis
 
 ```
