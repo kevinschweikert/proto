@@ -1,5 +1,5 @@
 use super::Render;
-use crate::packet::Packet;
+use crate::{Field, Packet};
 
 pub struct Mermaid {}
 
@@ -9,8 +9,18 @@ impl Render<String> for Mermaid {
         if let Some(title) = &packet.title {
             lines.push(format!("title {}", title))
         };
-        for field in packet.fields.clone() {
-            lines.push(format!("+{}: \"{}\"", field.bits, field.label));
+        let mut bits_used = 0;
+        for field in &packet.fields {
+            match field {
+                Field::Fixed { bits, label } => {
+                    bits_used += bits;
+                    lines.push(format!("+{}: \"{}\"", bits, label));
+                }
+                Field::Variable { label } => {
+                    let remaining_in_row = 32 - (bits_used % 32);
+                    lines.push(format!("+{}: \"{}\"", remaining_in_row, label));
+                }
+            };
         }
 
         lines.join("\n")

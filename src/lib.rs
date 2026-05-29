@@ -35,14 +35,21 @@ impl FromStr for Packet {
                     .trim()
                     .split_once(":")
                     .ok_or_else(|| PacketError::InvalidField(field_def.to_string()))?;
-                let bits = bits
-                    .trim()
-                    .parse()
-                    .map_err(|_| PacketError::InvalidBits(bits.to_string()))?;
-                Ok(Field {
-                    label: label.trim().to_string(),
-                    bits,
-                })
+                match bits {
+                    "*" => Ok(Field::Variable {
+                        label: label.trim().to_string(),
+                    }),
+                    bits => {
+                        let bits = bits
+                            .trim()
+                            .parse()
+                            .map_err(|_| PacketError::InvalidBits(bits.to_string()))?;
+                        Ok(Field::Fixed {
+                            label: label.trim().to_string(),
+                            bits,
+                        })
+                    }
+                }
             })
             .collect::<Result<Vec<Field>, PacketError>>()?;
         Ok(Packet {

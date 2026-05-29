@@ -1,6 +1,6 @@
 use proto::{Field, Packet, Render, Style, Terminal};
 mod common;
-use common::f;
+use common::{f, v};
 
 fn render_ascii(fields: Vec<Field>) -> String {
     let packet = Packet {
@@ -29,7 +29,7 @@ fn udp() {
             f(16, "Destination Port"),
             f(16, "Length"),
             f(16, "Checksum"),
-            f(32, "Data"),
+            v("Data"),
         ],
     };
 
@@ -45,6 +45,20 @@ fn test_single_field() {
     insta::assert_snapshot!( { render_ascii( vec![f(8,"A")]) }
         , @"
      0 1 2 3 4 5 6 7
+    +-+-+-+-+-+-+-+-+
+    |       A       |
+    +-+-+-+-+-+-+-+-+
+    ")
+}
+
+#[test]
+fn ruler_flag_respected() {
+    let packet = Packet {
+        title: None,
+        fields: vec![f(8, "A")],
+    };
+    let renderer = Terminal::new(8).set_ruler(false);
+    insta::assert_snapshot!(      renderer.render(&packet) , @"
     +-+-+-+-+-+-+-+-+
     |       A       |
     +-+-+-+-+-+-+-+-+
@@ -131,6 +145,30 @@ fn lasts_row_only_prints_available_bits() {
     +-+-+-+-+-+-+-+-+
     |           |
     +-+-+-+-+-+-+
+    ")
+}
+
+#[test]
+fn variable_width_takes_full_row() {
+    insta::assert_snapshot!(render_ascii(vec![f(8, "HEADER"), v("DATA")]), @"
+     0 1 2 3 4 5 6 7
+    +-+-+-+-+-+-+-+-+
+    |    HEADER     |
+    +-+-+-+-+-+-+-+-+
+    :     DATA      :
+    +-+-+-+-+-+-+-+-+
+    ")
+}
+
+#[test]
+fn variable_width_takes_full_row_unicode() {
+    insta::assert_snapshot!(render_unicode(vec![f(8, "HEADER"), v("DATA")]), @"
+     0 1 2 3 4 5 6 7
+    ╭───────────────╮
+    │    HEADER     │
+    ├───────────────┤
+    ┊     DATA      ┊
+    ╰───────────────╯
     ")
 }
 

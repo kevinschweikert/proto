@@ -5,7 +5,16 @@ pub struct Packet {
 }
 
 #[derive(Clone, Debug)]
-pub struct Field {
-    pub bits: usize,
-    pub label: String,
+pub enum Field {
+    Fixed { bits: usize, label: String },
+    Variable { label: String },
+}
+
+impl Field {
+    pub fn label(&self) -> &str {
+        match self {
+            Field::Fixed { label, .. } => label,
+            Field::Variable { label } => label,
+        }
+    }
 }
