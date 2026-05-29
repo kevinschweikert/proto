@@ -83,6 +83,12 @@ impl Row {
     }
 }
 
+impl Row {
+    fn width(&self) -> usize {
+        self.segments.iter().map(|s| s.width).sum()
+    }
+}
+
 #[derive(Clone)]
 struct Segment {
     label: String,
@@ -182,14 +188,22 @@ impl Terminal {
     }
 
     fn render_hline(&self, above: Option<&Row>, below: Option<&Row>) -> String {
-        let (left, right) = match (above, below) {
+        let (left, right, width) = match (above, below) {
             (None, None) => unreachable!(),
             // top row
-            (None, Some(_)) => (self.style.top_left, self.style.top_right),
+            (None, Some(r)) => (self.style.top_left, self.style.top_right, r.width()),
             // last row
-            (Some(_), None) => (self.style.bot_left, self.style.bot_right),
+            (Some(r), None) => (self.style.bot_left, self.style.bot_right, r.width()),
             // middle row
-            (Some(_), Some(_)) => (self.style.mid_left, self.style.mid_right),
+            (Some(a), Some(b)) => (
+                self.style.mid_left,
+                if b.width() < self.cells {
+                    self.style.bot_right
+                } else {
+                    self.style.mid_right
+                },
+                a.width(),
+            ),
         };
 
         let junction_char = |i| match self.style.junctions {
@@ -226,10 +240,10 @@ impl Terminal {
         let mut line = String::with_capacity(self.cells);
         line.push_str(left);
 
-        for i in 1..=self.cells {
+        for i in 1..=width {
             line.push_str(self.style.horizontal);
 
-            if i == self.cells {
+            if i == width {
                 line.push_str(right)
             } else {
                 line.push_str(junction_char(i))

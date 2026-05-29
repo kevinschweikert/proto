@@ -5,7 +5,7 @@ use common::f;
 fn render_ascii(fields: Vec<Field>) -> String {
     let packet = Packet {
         title: None,
-        fields: fields,
+        fields,
     };
     let renderer = Terminal::new(8);
     renderer.render(&packet)
@@ -14,7 +14,7 @@ fn render_ascii(fields: Vec<Field>) -> String {
 fn render_unicode(fields: Vec<Field>) -> String {
     let packet = Packet {
         title: None,
-        fields: fields,
+        fields,
     };
     let renderer = Terminal::new(8).with_style(Style::unicode());
     renderer.render(&packet)
@@ -123,6 +123,18 @@ fn split_into_two_rows() {
 }
 
 #[test]
+fn lasts_row_only_prints_available_bits() {
+    insta::assert_snapshot!(render_ascii(vec![f(14, "SHORTENED")]), @"
+     0 1 2 3 4 5 6 7
+    +-+-+-+-+-+-+-+-+
+    |   SHORTENED   |
+    +-+-+-+-+-+-+-+-+
+    |           |
+    +-+-+-+-+-+-+
+    ")
+}
+
+#[test]
 fn put_label_into_longest_segment() {
     insta::assert_snapshot!(render_ascii(vec![f(7, "PRE"),f(10, "LONG"), f(7, "POST")]), @"
      0 1 2 3 4 5 6 7
@@ -147,5 +159,17 @@ fn put_label_into_longest_segment_unicode() {
     ├─┬─────────────┤
     │ │    POST     │
     ╰─┴─────────────╯
+    ")
+}
+
+#[test]
+fn lasts_row_only_prints_available_bits_unicode() {
+    insta::assert_snapshot!(render_unicode(vec![f(14, "SHORTENED")]), @"
+     0 1 2 3 4 5 6 7
+    ╭───────────────╮
+    │   SHORTENED   │
+    ├───────────┬───╯
+    │           │
+    ╰───────────╯
     ")
 }
