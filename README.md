@@ -9,14 +9,30 @@ $ proto --help
 Usage: proto [OPTIONS] <DEFINITION>
 
 Arguments:
-  <DEFINITION>  
+  <DEFINITION>
+          Protocol name or inline definition
 
 Options:
-  -a, --ascii    
-  -u, --unicode  
-  -m, --mermaid  
-  -b, --b <B>    [default: 32]
-  -h, --help     Print help
+  -s, --style <STYLE>
+          Output style
+
+          Possible values:
+          - ascii:   RFC Style ASCII characters
+          - unicode: Modern unicode characters
+          - mermaid: Mermaid spec
+          
+          [default: ascii]
+
+  -b, --bits-per-row <B>
+          number of bits per row
+          
+          [default: 32]
+
+  -n, --no-ruler
+          omit the bit number header
+
+  -h, --help
+          Print help (see a summary with '-h')
 ```
 
 ## Packet Definitions
@@ -24,7 +40,7 @@ Options:
 A packet definition is a comma-separated list of `label:bits` pairs:
 
 ```
-"SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:32"
+"SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
 
 ## Examples
@@ -32,47 +48,47 @@ A packet definition is a comma-separated list of `label:bits` pairs:
 **ASCII (32-bit width, the default):**
 
 ```bash
-proto "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:32"
+proto "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
 
 Output:
 
 ```
-0                   1                   2                   3
+ 0                   1                   2                   3  
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |          SourcePort           |           DestPort            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |            Length             |           Checksum            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                             Data                              |
+:                             Data                              :
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
 
 **Unicode (32-bit width):**
 
 ```bash
-proto --unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:32"
+proto --style unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
 
 Output:
 
 ```
-0                   1                   2                   3
+ 0                   1                   2                   3  
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 ╭───────────────────────────────┬───────────────────────────────╮
 │          SourcePort           │           DestPort            │
 ├───────────────────────────────┼───────────────────────────────┤
 │            Length             │           Checksum            │
 ├───────────────────────────────┴───────────────────────────────┤
-│                             Data                              │
+┊                             Data                              ┊
 ╰───────────────────────────────────────────────────────────────╯
 ```
 
 **Mermaid.js:**
 
 ```bash
-proto --mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:32"
+proto --style mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
 
 Output:
@@ -86,14 +102,23 @@ packet
 +32: "Data"
 ```
 
-**Built-in shortcut — `udp`:**
+**Built-in shortcuts:**
 
 ```bash
-proto udp
+$ proto --list
 ```
 
-**Custom width (16 bits):**
+Output:
+
+```
+Available Protocols:
+
+  udp    User Datagram Protocol
+  tcp    Transmission Control Protocol
+```
+
+Use like this:
 
 ```bash
-proto -b 16 "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:32"
+proto tcp
 ```
