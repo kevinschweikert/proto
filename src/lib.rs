@@ -1,4 +1,6 @@
+mod definitions;
 pub mod packet;
+pub mod registry;
 pub mod render;
 
 pub use packet::{Field, Packet};
