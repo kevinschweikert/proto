@@ -4,6 +4,7 @@ pub mod render;
 pub use packet::{Field, Packet};
 pub use render::Render;
 pub use render::ascii::{Style, Terminal};
+pub use render::mermaid::Mermaid;
 
 pub fn render_terminal(packet: &Packet, width: usize, style: Option<Style>) -> String {
     let style = match style {

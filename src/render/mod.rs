@@ -1,4 +1,5 @@
 pub mod ascii;
+pub mod mermaid;
 
 use crate::packet::Packet;
 

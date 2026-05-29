@@ -162,15 +162,25 @@ impl Terminal {
         if rows.last().is_some_and(|row| row.segments.is_empty()) {
             rows.pop();
         }
-        return rows;
+        rows
+    }
+
+    fn render_dline(&self) -> String {
+        (0..self.cells)
+            .map(|i| {
+                if i % 10 == 0 {
+                    format!(" {}", i / 10)
+                } else {
+                    format!("{}{}", WHITESPACE, WHITESPACE)
+                }
+            })
+            .collect()
     }
 
     fn render_bline(&self) -> String {
-        (0..self.cells)
-            .map(|i| format!(" {}", i % 10))
-            .collect::<Vec<_>>()
-            .join("")
+        (0..self.cells).map(|i| format!(" {}", i % 10)).collect()
     }
+
     fn render_hline(&self, above: Option<&Row>, below: Option<&Row>) -> String {
         let (left, right) = match (above, below) {
             (None, None) => unreachable!(),
@@ -226,7 +236,7 @@ impl Terminal {
             }
         }
 
-        return line;
+        line
     }
 
     fn render_row(&self, row: &Row) -> String {
@@ -262,8 +272,11 @@ impl Terminal {
 impl Render<String> for Terminal {
     fn render(&self, packet: &Packet) -> String {
         let rows = self.layout_segments(packet.fields.clone());
-        let bline = self.render_bline();
-        let mut output: Vec<String> = vec![bline];
+        let mut output: Vec<String> = vec![];
+        if self.cells >= 10 {
+            output.push(self.render_dline());
+        }
+        output.push(self.render_bline());
         output.push(self.render_hline(None, Some(&rows[0])));
         for (above, below) in rows.iter().zip(rows.iter().skip(1)) {
             output.push(self.render_row(above));

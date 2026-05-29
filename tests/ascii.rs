@@ -1,27 +1,29 @@
 use proto::{Field, Packet, Render, Style, Terminal};
+mod common;
+use common::f;
 
 fn render_ascii(fields: Vec<Field>) -> String {
-    let packet = Packet { fields: fields };
+    let packet = Packet {
+        title: None,
+        fields: fields,
+    };
     let renderer = Terminal::new(8);
     renderer.render(&packet)
 }
 
 fn render_unicode(fields: Vec<Field>) -> String {
-    let packet = Packet { fields: fields };
+    let packet = Packet {
+        title: None,
+        fields: fields,
+    };
     let renderer = Terminal::new(8).with_style(Style::unicode());
     renderer.render(&packet)
-}
-
-fn f(bits: usize, label: &str) -> Field {
-    Field {
-        bits: bits,
-        label: label.to_string(),
-    }
 }
 
 #[test]
 fn udp() {
     let packet = Packet {
+        title: Some("UDP Packet".to_string()),
         fields: vec![
             f(16, "Source Port"),
             f(16, "Destination Port"),

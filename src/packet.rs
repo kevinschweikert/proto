@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub struct Packet {
+    pub title: Option<String>,
     pub fields: Vec<Field>,
 }
 
