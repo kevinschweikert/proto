@@ -1,6 +1,6 @@
 use proto::{Field, Packet, Render, RfcDiagram, Style};
 mod common;
-use common::{f, v};
+use common::{f, p, v};
 
 fn render_ascii(fields: Vec<Field>) -> String {
     let packet = Packet {
@@ -53,10 +53,7 @@ fn test_single_field() {
 
 #[test]
 fn ruler_flag_respected() {
-    let packet = Packet {
-        title: None,
-        fields: vec![f(8, "A")],
-    };
+    let packet = p(None, vec![f(8, "A")]);
     let renderer = RfcDiagram::new(8).with_ruler(false);
     insta::assert_snapshot!(      renderer.render(&packet) , @"
     +-+-+-+-+-+-+-+-+

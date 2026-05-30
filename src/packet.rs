@@ -1,10 +1,10 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Packet {
     pub title: Option<String>,
     pub fields: Vec<Field>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Field {
     Fixed { bits: usize, label: String },
     Variable { label: String },
