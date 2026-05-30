@@ -23,6 +23,7 @@ fn repace_blocks(content: &str) -> Result<String> {
         if let Some(args) = parse_start(line) {
             writeln!(result, "{line}")?;
             writeln!(result, "<!-- AUTO-GENERATED: run `cargo -p xtask` -->")?;
+            writeln!(result)?;
 
             let output = run_command(&args)?;
 
@@ -36,6 +37,7 @@ fn repace_blocks(content: &str) -> Result<String> {
             writeln!(result, "```")?;
             writeln!(result, "{}", &output)?;
             writeln!(result, "```")?;
+            writeln!(result)?;
 
             while let Some(next) = lines.next() {
                 if next.trim() == END_MARKER {

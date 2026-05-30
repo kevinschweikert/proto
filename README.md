@@ -6,6 +6,7 @@ Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
 <!-- BEGIN CLI: udp --unicode --clean -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto udp --unicode --clean
 ```
@@ -23,6 +24,7 @@ Output:
 ┊                             Data                              ┊
 ╰───────────────────────────────────────────────────────────────╯
 ```
+
 <!-- END CLI -->
 
 ## Installation
@@ -35,6 +37,7 @@ cargo install --git https://github.com/kevinschweikert/proto.git
 
 <!-- BEGIN CLI: --help -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto --help
 ```
@@ -54,8 +57,10 @@ Options:
   -b, --bits-per-row <BITS_PER_ROW>  number of bits per row [default: 32]
   -n, --no-ruler                     omit the bit number header
   -l, --list                         list available protocols
+  -f, --from-kaitai <FROM_KAITAI>    path to a kaitai spec file
   -h, --help                         Print help
 ```
+
 <!-- END CLI -->
 
 ## Packet Definitions
@@ -72,6 +77,7 @@ A packet definition is a comma-separated list of `label:bits` pairs:
 
 <!-- BEGIN CLI: "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*" -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
 ```
@@ -93,12 +99,14 @@ Output:
 :                             Data                              :
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
+
 <!-- END CLI -->
 
 **Unicode:**
 
 <!-- BEGIN CLI: --unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*" -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto --unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
 ```
@@ -120,12 +128,14 @@ Output:
 ┊                             Data                              ┊
 ╰─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─╯
 ```
+
 <!-- END CLI -->
 
 **Mermaid.js:**
 
 <!-- BEGIN CLI: --mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*" -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto --mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
@@ -140,12 +150,14 @@ packet
 +16: "Checksum"
 +32: "Data"
 ```
+
 <!-- END CLI -->
 
 **Built-in shortcuts:**
 
 <!-- BEGIN CLI: --list -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
+
 ```bash
 proto --list
 ```
@@ -162,10 +174,22 @@ Layer 4 (Transport):
   udp    User Datagram Protocol
   tcp    Transmission Control Protocol
 ```
+
 <!-- END CLI -->
 
 Use like this:
 
 ```bash
 proto tcp
+```
+
+## Kaitai
+
+> [!NOTE]
+> Only a minimal subset of the spec will be parsed and supported
+
+A [Kaitai Struct](https://kaitai.io/) specification can be loaded and visualized via:
+
+```bash
+proto --from-kaitai [PATH TO FILE]
 ```

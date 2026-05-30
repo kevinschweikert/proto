@@ -17,4 +17,10 @@ impl Field {
             Field::Variable { label } => label,
         }
     }
+    pub fn bits(&self) -> Option<usize> {
+        match self {
+            Field::Fixed { bits, .. } => Some(*bits),
+            Field::Variable { .. } => None,
+        }
+    }
 }

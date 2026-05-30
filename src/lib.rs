@@ -1,4 +1,5 @@
 mod definitions;
+pub mod kaitai;
 pub mod packet;
 pub mod registry;
 pub mod render;
@@ -17,6 +18,8 @@ pub enum PacketError {
     InvalidField(String),
     #[error("invalid bit size: {0}")]
     InvalidBits(String),
+    #[error("invalid kaitai spec")]
+    InvalidKaitaiSpec,
 }
 
 pub fn render_terminal(packet: &Packet, width: usize, style: Option<Style>) -> String {

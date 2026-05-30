@@ -1,7 +1,7 @@
-use std::process::exit;
+use std::{fs, path::PathBuf, process::exit};
 
 use clap::{Parser, ValueEnum};
-use proto::{Mermaid, Packet, Render, RfcDiagram, Style, registry, render::rfc::Junctions};
+use proto::{Mermaid, Packet, Render, RfcDiagram, Style, kaitai, registry, render::rfc::Junctions};
 use thiserror::Error;
 
 #[derive(Clone, ValueEnum)]
@@ -39,6 +39,9 @@ struct Cli {
     #[arg(short, long)]
     /// list available protocols
     list: bool,
+    #[arg(short, long)]
+    /// path to a kaitai spec file
+    from_kaitai: Option<PathBuf>,
 }
 
 #[derive(Error, Debug)]
@@ -74,14 +77,16 @@ fn run() -> Result<(), CliError> {
         exit(0)
     }
 
-    let definition = match cli.definition {
-        None => return Err(CliError::MissingDefinition),
-        Some(def) => def,
-    };
+    let packet = if let Some(kaitai_path) = cli.from_kaitai {
+        let content = fs::read_to_string(kaitai_path).map_err(|_| CliError::InvalidDefinition)?;
+        kaitai::parse_kaitai(&content)?
+    } else {
+        let definition = cli.definition.ok_or(CliError::MissingDefinition)?;
 
-    let packet = match registry::get(definition.as_str()) {
-        Some(p) => p,
-        None => definition.parse::<Packet>()?,
+        match registry::get(definition.as_str()) {
+            Some(p) => p,
+            None => definition.parse::<Packet>()?,
+        }
     };
 
     let junctions = match cli.clean {
