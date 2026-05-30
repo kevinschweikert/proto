@@ -3,6 +3,9 @@ name = "proto"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = [".", "xtask"]
+
 
 [dev-dependencies]
 insta = "1.47.2"
