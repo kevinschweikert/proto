@@ -6,7 +6,7 @@ const START_MARKER: &'static str = "<!-- BEGIN CLI:";
 const CLOSE_MARKER: &'static str = "-->";
 const END_MARKER: &'static str = "<!-- END CLI -->";
 
-const README_PATH: &'static str = "../README.md";
+const README_PATH: &'static str = "README.md";
 
 fn main() -> Result<()> {
     let readme = fs::read_to_string(README_PATH)?;

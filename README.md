@@ -1,5 +1,7 @@
 # proto
 
+[![CI](https://github.com/kevinschweikert/proto/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinschweikert/proto/actions/workflows/ci.yml)
+
 Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
 <!-- BEGIN CLI: udp --style unicode -->
