@@ -4,10 +4,10 @@
 
 Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
-<!-- BEGIN CLI: udp --style unicode --clean -->
+<!-- BEGIN CLI: udp --unicode --clean -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
 ```bash
-proto udp --style unicode --clean
+proto udp --unicode --clean
 ```
 
 Output:
@@ -45,36 +45,16 @@ Output:
 Usage: proto [OPTIONS] [DEFINITION]
 
 Arguments:
-  [DEFINITION]
-          Protocol name or inline definition
+  [DEFINITION]  Protocol name or inline definition
 
 Options:
-  -s, --style <STYLE>
-          Output style
-
-          Possible values:
-          - ascii:   RFC Style ASCII characters
-          - unicode: Modern unicode characters
-          - mermaid: Mermaid spec
-          
-          [default: ascii]
-
-  -c, --clean
-          remove crosses for each bit in a field for cleaner rendering
-
-  -b, --bits-per-row <BITS_PER_ROW>
-          number of bits per row
-          
-          [default: 32]
-
-  -n, --no-ruler
-          omit the bit number header
-
-  -l, --list
-          
-
-  -h, --help
-          Print help (see a summary with '-h')
+  -u, --unicode                      Output in unicode style
+  -m, --mermaid                      Output a mermaid.js spec
+  -c, --clean                        remove crosses for each bit in a field for cleaner rendering
+  -b, --bits-per-row <BITS_PER_ROW>  number of bits per row [default: 32]
+  -n, --no-ruler                     omit the bit number header
+  -l, --list                         list available protocols
+  -h, --help                         Print help
 ```
 <!-- END CLI -->
 
@@ -117,10 +97,10 @@ Output:
 
 **Unicode:**
 
-<!-- BEGIN CLI: --style unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*" -->
+<!-- BEGIN CLI: --unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*" -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
 ```bash
-proto --style unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
+proto --unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
 ```
 
 Output:
@@ -144,10 +124,10 @@ Output:
 
 **Mermaid.js:**
 
-<!-- BEGIN CLI: --style mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*" -->
+<!-- BEGIN CLI: --mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*" -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
 ```bash
-proto --style mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
+proto --mermaid "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
 ```
 
 Output:

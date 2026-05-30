@@ -19,8 +19,14 @@ struct Cli {
     /// Protocol name or inline definition
     definition: Option<String>,
     /// Output style
-    #[arg(value_enum, short = 's', long, default_value_t = OutputType::Ascii)]
+    #[arg(value_enum, short = 's', long, default_value_t = OutputType::Ascii, hide = true)]
     style: OutputType,
+    /// Output in unicode style
+    #[arg(short, long, conflicts_with = "mermaid", overrides_with = "style")]
+    unicode: bool,
+    /// Output a mermaid.js spec
+    #[arg(short, long, conflicts_with = "unicode", overrides_with = "style")]
+    mermaid: bool,
     #[arg(short, long)]
     /// remove crosses for each bit in a field for cleaner rendering
     clean: bool,
@@ -31,6 +37,7 @@ struct Cli {
     #[arg(short, long)]
     no_ruler: bool,
     #[arg(short, long)]
+    /// list available protocols
     list: bool,
 }
 
@@ -82,7 +89,15 @@ fn run() -> Result<(), CliError> {
         false => Junctions::All,
     };
 
-    let renderer: Box<dyn Render> = match cli.style {
+    let output_type = if cli.unicode {
+        OutputType::Unicode
+    } else if cli.mermaid {
+        OutputType::Mermaid
+    } else {
+        cli.style.clone()
+    };
+
+    let renderer: Box<dyn Render> = match output_type {
         OutputType::Ascii => Box::new(
             RfcDiagram::new(cli.bits_per_row)
                 .with_style(Style::ascii().with_junctions(junctions))
