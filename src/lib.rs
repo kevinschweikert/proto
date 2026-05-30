@@ -5,8 +5,8 @@ pub mod render;
 
 pub use packet::{Field, Packet};
 pub use render::Render;
-pub use render::ascii::{Style, Terminal};
 pub use render::mermaid::Mermaid;
+pub use render::rfc::{RfcDiagram, Style};
 
 use std::str::FromStr;
 use thiserror::Error;
@@ -24,7 +24,7 @@ pub fn render_terminal(packet: &Packet, width: usize, style: Option<Style>) -> S
         Some(style) => style,
         None => Style::ascii(),
     };
-    Terminal::new(width).with_style(style).render(packet)
+    RfcDiagram::new(width).with_style(style).render(packet)
 }
 
 impl FromStr for Packet {

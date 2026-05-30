@@ -1,4 +1,4 @@
-use proto::{Field, Packet, Render, Style, Terminal};
+use proto::{Field, Packet, Render, RfcDiagram, Style};
 mod common;
 use common::{f, v};
 
@@ -7,7 +7,7 @@ fn render_ascii(fields: Vec<Field>) -> String {
         title: None,
         fields,
     };
-    let renderer = Terminal::new(8);
+    let renderer = RfcDiagram::new(8);
     renderer.render(&packet)
 }
 
@@ -16,7 +16,7 @@ fn render_unicode(fields: Vec<Field>) -> String {
         title: None,
         fields,
     };
-    let renderer = Terminal::new(8).with_style(Style::unicode());
+    let renderer = RfcDiagram::new(8).with_style(Style::unicode());
     renderer.render(&packet)
 }
 
@@ -33,10 +33,10 @@ fn udp() {
         ],
     };
 
-    let renderer = Terminal::new(32);
+    let renderer = RfcDiagram::new(32);
     insta::assert_snapshot!(renderer.render(&packet));
 
-    let renderer = Terminal::new(32).with_style(Style::unicode());
+    let renderer = RfcDiagram::new(32).with_style(Style::unicode());
     insta::assert_snapshot!(renderer.render(&packet))
 }
 
@@ -57,7 +57,7 @@ fn ruler_flag_respected() {
         title: None,
         fields: vec![f(8, "A")],
     };
-    let renderer = Terminal::new(8).set_ruler(false);
+    let renderer = RfcDiagram::new(8).with_ruler(false);
     insta::assert_snapshot!(      renderer.render(&packet) , @"
     +-+-+-+-+-+-+-+-+
     |       A       |

@@ -3,7 +3,10 @@ use crate::{Field, Packet};
 
 pub struct Mermaid {}
 
-impl Render<String> for Mermaid {
+// we just assume a width of 32 bits to calculate variable fields
+const WIDTH: usize = 32;
+
+impl Render for Mermaid {
     fn render(&self, packet: &Packet) -> String {
         let mut lines = vec!["packet".to_string()];
         if let Some(title) = &packet.title {
@@ -17,7 +20,7 @@ impl Render<String> for Mermaid {
                     lines.push(format!("+{}: \"{}\"", bits, label));
                 }
                 Field::Variable { label } => {
-                    let remaining_in_row = 32 - (bits_used % 32);
+                    let remaining_in_row = WIDTH - (bits_used % WIDTH);
                     lines.push(format!("+{}: \"{}\"", remaining_in_row, label));
                 }
             };

@@ -3,6 +3,8 @@ use std::collections::BTreeSet;
 use super::Render;
 use crate::packet::{Field, Packet};
 
+const WHITESPACE: &str = " ";
+
 pub enum Junctions {
     All,
     Boundaries,
@@ -66,12 +68,6 @@ impl Style {
     }
 }
 
-pub struct Terminal {
-    cells: usize,
-    style: Style,
-    ruler: bool,
-}
-
 #[derive(Clone)]
 struct Row {
     segments: Vec<Segment>,
@@ -101,11 +97,16 @@ struct Segment {
     open: bool,
 }
 
-const WHITESPACE: &str = " ";
-impl Terminal {
-    pub fn new(width: usize) -> Self {
-        Terminal {
-            cells: width,
+pub struct RfcDiagram {
+    width: usize,
+    style: Style,
+    ruler: bool,
+}
+
+impl RfcDiagram {
+    pub fn new(bits_per_row: usize) -> Self {
+        RfcDiagram {
+            width: bits_per_row,
             style: Style::ascii(),
             ruler: true,
         }
@@ -116,22 +117,22 @@ impl Terminal {
         self
     }
 
-    pub fn set_ruler(mut self, show: bool) -> Self {
+    pub fn with_ruler(mut self, show: bool) -> Self {
         self.ruler = show;
         self
     }
 
-    fn layout_segments(&self, fields: Vec<Field>) -> Vec<Row> {
+    fn layout_segments(&self, fields: &[Field]) -> Vec<Row> {
         let mut rows: Vec<Row> = vec![Row::new()];
         let mut current_row_length = 0;
         for field in fields {
-            let mut remaining = match field {
+            let mut remaining = match *field {
                 Field::Fixed { bits, .. } => bits,
-                Field::Variable { .. } => self.cells - current_row_length,
+                Field::Variable { .. } => self.width - current_row_length,
             };
             let mut group: Vec<(usize, usize)> = vec![];
             while remaining > 0 {
-                let capacity = self.cells.saturating_sub(current_row_length);
+                let capacity = self.width.saturating_sub(current_row_length);
                 let take = remaining.min(capacity);
                 let start = current_row_length;
                 let end = current_row_length + take;
@@ -160,7 +161,7 @@ impl Terminal {
                 current_row_length += take;
                 remaining -= take;
 
-                if current_row_length == self.cells {
+                if current_row_length == self.width {
                     rows.push(Row::new());
                     current_row_length = 0;
                 }
@@ -191,7 +192,7 @@ impl Terminal {
 
     fn render_ruler(&self) -> String {
         let mut ruler = vec![];
-        if self.cells >= 10 {
+        if self.width >= 10 {
             ruler.push(self.render_dline());
         }
         ruler.push(self.render_bline());
@@ -199,7 +200,7 @@ impl Terminal {
     }
 
     fn render_dline(&self) -> String {
-        (0..self.cells)
+        (0..self.width)
             .map(|i| {
                 if i % 10 == 0 {
                     format!(" {}", i / 10)
@@ -211,7 +212,7 @@ impl Terminal {
     }
 
     fn render_bline(&self) -> String {
-        (0..self.cells).map(|i| format!(" {}", i % 10)).collect()
+        (0..self.width).map(|i| format!(" {}", i % 10)).collect()
     }
 
     fn render_hline(&self, above: Option<&Row>, below: Option<&Row>) -> String {
@@ -224,7 +225,7 @@ impl Terminal {
             // middle row
             (Some(a), Some(b)) => (
                 self.style.mid_left,
-                if b.width() < self.cells {
+                if b.width() < self.width {
                     self.style.bot_right
                 } else {
                     self.style.mid_right
@@ -264,7 +265,7 @@ impl Terminal {
             },
         };
 
-        let mut line = String::with_capacity(self.cells);
+        let mut line = String::with_capacity(self.width);
         line.push_str(left);
 
         for i in 1..=width {
@@ -321,9 +322,9 @@ impl Terminal {
     }
 }
 
-impl Render<String> for Terminal {
+impl Render for RfcDiagram {
     fn render(&self, packet: &Packet) -> String {
-        let rows = self.layout_segments(packet.fields.clone());
+        let rows = self.layout_segments(&packet.fields);
         let mut output: Vec<String> = vec![];
 
         if self.ruler {

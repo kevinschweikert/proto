@@ -1,8 +1,8 @@
-pub mod ascii;
 pub mod mermaid;
+pub mod rfc;
 
 use crate::packet::Packet;
 
-pub trait Render<T> {
-    fn render(&self, packet: &Packet) -> T;
+pub trait Render {
+    fn render(&self, packet: &Packet) -> String;
 }

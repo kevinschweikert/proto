@@ -1,7 +1,7 @@
 use std::process::exit;
 
 use clap::{Parser, ValueEnum};
-use proto::{Mermaid, Packet, Render, Style, Terminal, registry};
+use proto::{Mermaid, Packet, Render, RfcDiagram, Style, registry};
 use thiserror::Error;
 
 #[derive(Clone, ValueEnum)]
@@ -54,8 +54,12 @@ fn run() -> Result<(), CliError> {
     if cli.list {
         println!("Available Protocols:");
         println!("");
-        for (name, description) in registry::list() {
-            println!("  {}    {}", name, description);
+        for (category, definitions) in registry::list() {
+            println!("{}:", category);
+            for def in definitions {
+                println!("  {}    {}", def.name, def.description);
+            }
+            println!("")
         }
         exit(0)
     }
@@ -70,16 +74,16 @@ fn run() -> Result<(), CliError> {
         None => definition.parse::<Packet>()?,
     };
 
-    let renderer: Box<dyn Render<_>> = match cli.style {
+    let renderer: Box<dyn Render> = match cli.style {
         OutputStyle::Ascii => Box::new(
-            Terminal::new(cli.b)
+            RfcDiagram::new(cli.b)
                 .with_style(Style::ascii())
-                .set_ruler(!cli.no_ruler),
+                .with_ruler(!cli.no_ruler),
         ),
         OutputStyle::Unicode => Box::new(
-            Terminal::new(cli.b)
+            RfcDiagram::new(cli.b)
                 .with_style(Style::unicode())
-                .set_ruler(!cli.no_ruler),
+                .with_ruler(!cli.no_ruler),
         ),
         OutputStyle::Mermaid => Box::new(Mermaid {}),
     };
