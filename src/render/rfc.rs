@@ -66,6 +66,11 @@ impl Style {
             junctions: Junctions::Boundaries,
         }
     }
+
+    pub fn with_junctions(mut self, junctions: Junctions) -> Self {
+        self.junctions = junctions;
+        self
+    }
 }
 
 #[derive(Clone)]
@@ -291,7 +296,13 @@ impl RfcDiagram {
     }
     fn junction_char(&self, i: usize, above: Option<&Row>, below: Option<&Row>) -> &'static str {
         match self.style.junctions {
-            Junctions::All => self.style.mid_mid,
+            Junctions::All => match (above, below) {
+                (None, None) => unreachable!(),
+                (None, Some(_)) => self.style.top_mid,
+                (Some(_), Some(_)) => self.style.mid_mid,
+                (Some(_), None) => self.style.bot_mid,
+            },
+
             Junctions::Boundaries => match (above, below) {
                 (None, None) => unreachable!(),
                 (None, Some(r)) => {

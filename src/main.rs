@@ -1,11 +1,11 @@
 use std::process::exit;
 
 use clap::{Parser, ValueEnum};
-use proto::{Mermaid, Packet, Render, RfcDiagram, Style, registry};
+use proto::{Mermaid, Packet, Render, RfcDiagram, Style, registry, render::rfc::Junctions};
 use thiserror::Error;
 
 #[derive(Clone, ValueEnum)]
-enum OutputStyle {
+enum OutputType {
     /// RFC Style ASCII characters
     Ascii,
     /// Modern unicode characters
@@ -19,11 +19,14 @@ struct Cli {
     /// Protocol name or inline definition
     definition: Option<String>,
     /// Output style
-    #[arg(value_enum, short = 's', long, default_value_t = OutputStyle::Ascii)]
-    style: OutputStyle,
+    #[arg(value_enum, short = 's', long, default_value_t = OutputType::Ascii)]
+    style: OutputType,
+    #[arg(short, long)]
+    /// remove crosses for each bit in a field for cleaner rendering
+    clean: bool,
     /// number of bits per row
-    #[arg(short, long = "bits-per-row", default_value_t = 32)]
-    b: usize,
+    #[arg(short = 'b', long = "bits-per-row", default_value_t = 32)]
+    bits_per_row: usize,
     /// omit the bit number header
     #[arg(short, long)]
     no_ruler: bool,
@@ -74,18 +77,23 @@ fn run() -> Result<(), CliError> {
         None => definition.parse::<Packet>()?,
     };
 
+    let junctions = match cli.clean {
+        true => Junctions::Boundaries,
+        false => Junctions::All,
+    };
+
     let renderer: Box<dyn Render> = match cli.style {
-        OutputStyle::Ascii => Box::new(
-            RfcDiagram::new(cli.b)
-                .with_style(Style::ascii())
+        OutputType::Ascii => Box::new(
+            RfcDiagram::new(cli.bits_per_row)
+                .with_style(Style::ascii().with_junctions(junctions))
                 .with_ruler(!cli.no_ruler),
         ),
-        OutputStyle::Unicode => Box::new(
-            RfcDiagram::new(cli.b)
-                .with_style(Style::unicode())
+        OutputType::Unicode => Box::new(
+            RfcDiagram::new(cli.bits_per_row)
+                .with_style(Style::unicode().with_junctions(junctions))
                 .with_ruler(!cli.no_ruler),
         ),
-        OutputStyle::Mermaid => Box::new(Mermaid {}),
+        OutputType::Mermaid => Box::new(Mermaid {}),
     };
 
     println!("{}", renderer.render(&packet));

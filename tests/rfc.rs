@@ -63,6 +63,36 @@ fn ruler_flag_respected() {
 }
 
 #[test]
+fn ascii_junctions_clean() {
+    let packet = p(None, vec![f(8, "A"), f(8, "B")]);
+    let renderer = RfcDiagram::new(8)
+        .with_ruler(false)
+        .with_style(Style::ascii().with_junctions(proto::render::rfc::Junctions::Boundaries));
+    insta::assert_snapshot!(      renderer.render(&packet) , @"
+    +---------------+
+    |       A       |
+    +---------------+
+    |       B       |
+    +---------------+
+    ")
+}
+
+#[test]
+fn unicode_junctions_all() {
+    let packet = p(None, vec![f(8, "A"), f(8, "B")]);
+    let renderer = RfcDiagram::new(8)
+        .with_ruler(false)
+        .with_style(Style::unicode().with_junctions(proto::render::rfc::Junctions::All));
+    insta::assert_snapshot!(      renderer.render(&packet) , @"
+    ╭─┬─┬─┬─┬─┬─┬─┬─╮
+    │       A       │
+    ├─┼─┼─┼─┼─┼─┼─┼─┤
+    │       B       │
+    ╰─┴─┴─┴─┴─┴─┴─┴─╯
+    ")
+}
+
+#[test]
 fn test_single_field_unicode() {
     insta::assert_snapshot!( { render_unicode( vec![f(8,"A")]) }
         , @"

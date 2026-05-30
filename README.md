@@ -4,10 +4,10 @@
 
 Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
-<!-- BEGIN CLI: udp --style unicode -->
+<!-- BEGIN CLI: udp --style unicode --clean -->
 <!-- AUTO-GENERATED: run `cargo -p xtask` -->
 ```bash
-proto udp --style unicode
+proto udp --style unicode --clean
 ```
 
 Output:
@@ -59,7 +59,10 @@ Options:
           
           [default: ascii]
 
-  -b, --bits-per-row <B>
+  -c, --clean
+          remove crosses for each bit in a field for cleaner rendering
+
+  -b, --bits-per-row <BITS_PER_ROW>
           number of bits per row
           
           [default: 32]
@@ -125,17 +128,17 @@ Output:
 ```
 0                   1                   2                   3  
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-╭───────────────────────────────┬───────────────────────────────╮
+╭─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─╮
 │          SourcePort           │           DestPort            │
-├───────────────────────────────┼───────────────────────────────┤
+├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
 │            Length             │           Checksum            │
-├───────────────────────────────┴───────────────────────────────┤
+├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
 │                             Chunk                             │
 ├                                                               ┤
 │                                                               │
-├───────────────────────────────────────────────────────────────┤
+├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
 ┊                             Data                              ┊
-╰───────────────────────────────────────────────────────────────╯
+╰─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─╯
 ```
 <!-- END CLI -->
 
