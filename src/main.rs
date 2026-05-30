@@ -53,13 +53,13 @@ fn run() -> Result<(), CliError> {
 
     if cli.list {
         println!("Available Protocols:");
-        println!("");
+        println!();
         for (category, definitions) in registry::list() {
             println!("{}:", category);
             for def in definitions {
                 println!("  {}    {}", def.name, def.description);
             }
-            println!("")
+            println!()
         }
         exit(0)
     }

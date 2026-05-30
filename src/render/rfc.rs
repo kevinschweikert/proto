@@ -87,12 +87,33 @@ impl Row {
     fn width(&self) -> usize {
         self.segments.iter().map(|s| s.width).sum()
     }
+
+    fn segment_at(&self, offset: usize) -> Option<&Segment> {
+        for seg in &self.segments {
+            if (seg.row_offset..seg.row_offset + seg.width).contains(&offset) {
+                return Some(seg);
+            }
+        }
+        None
+    }
+
+    fn same_group_at(&self, compare_to: &Row, offset: usize) -> bool {
+        let sa = self.segment_at(offset);
+        let sb = compare_to.segment_at(offset);
+
+        match (sa, sb) {
+            (Some(a), Some(b)) => a.group == b.group,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Clone)]
 struct Segment {
+    group: usize,
     label: String,
     width: usize,
+    row_offset: usize,
     show_label: bool,
     open: bool,
 }
@@ -125,7 +146,7 @@ impl RfcDiagram {
     fn layout_segments(&self, fields: &[Field]) -> Vec<Row> {
         let mut rows: Vec<Row> = vec![Row::new()];
         let mut current_row_length = 0;
-        for field in fields {
+        for (field_idx, field) in fields.iter().enumerate() {
             let mut remaining = match *field {
                 Field::Fixed { bits, .. } => bits,
                 Field::Variable { .. } => self.width - current_row_length,
@@ -141,13 +162,12 @@ impl RfcDiagram {
                 let row = rows.last_mut().expect("always one row");
 
                 let segment = Segment {
+                    group: field_idx,
                     label: field.label().to_string(),
                     width: take,
+                    row_offset: start,
                     show_label: false,
-                    open: match field {
-                        Field::Fixed { .. } => false,
-                        Field::Variable { .. } => true,
-                    },
+                    open: matches!(field, Field::Variable { .. }),
                 };
 
                 row.segments.push(segment);
@@ -234,7 +254,43 @@ impl RfcDiagram {
             ),
         };
 
-        let junction_char = |i| match self.style.junctions {
+        let mut line = String::with_capacity(self.width);
+        line.push_str(left);
+
+        for i in 1..=width {
+            let skip_h = match (above, below) {
+                (Some(a), Some(b)) => a.same_group_at(b, i - 1),
+                _ => false,
+            };
+            line.push_str(if skip_h {
+                WHITESPACE
+            } else {
+                self.style.horizontal
+            });
+
+            if i == width {
+                line.push_str(right);
+            } else {
+                let skip_j = match (above, below) {
+                    (Some(a), Some(b)) => {
+                        a.same_group_at(b, i)
+                            && !a.boundaries.contains(&i)
+                            && !b.boundaries.contains(&i)
+                    }
+                    _ => false,
+                };
+                line.push_str(if skip_j {
+                    WHITESPACE
+                } else {
+                    self.junction_char(i, above, below)
+                });
+            }
+        }
+
+        line
+    }
+    fn junction_char(&self, i: usize, above: Option<&Row>, below: Option<&Row>) -> &'static str {
+        match self.style.junctions {
             Junctions::All => self.style.mid_mid,
             Junctions::Boundaries => match (above, below) {
                 (None, None) => unreachable!(),
@@ -263,22 +319,7 @@ impl RfcDiagram {
                     }
                 }
             },
-        };
-
-        let mut line = String::with_capacity(self.width);
-        line.push_str(left);
-
-        for i in 1..=width {
-            line.push_str(self.style.horizontal);
-
-            if i == width {
-                line.push_str(right)
-            } else {
-                line.push_str(junction_char(i))
-            }
         }
-
-        line
     }
 
     fn render_row(&self, row: &Row) -> String {

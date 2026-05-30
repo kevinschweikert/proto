@@ -2,6 +2,19 @@
 
 Render network packet field diagrams as ASCII art, Unicode art, or Mermaid.js.
 
+```
+> proto udp --style unicode
+ 0                   1                   2                   3  
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+╭───────────────────────────────┬───────────────────────────────╮
+│          Source Port          │       Destination Port        │
+├───────────────────────────────┼───────────────────────────────┤
+│            Length             │           Checksum            │
+├───────────────────────────────┴───────────────────────────────┤
+┊                             Data                              ┊
+╰───────────────────────────────────────────────────────────────╯
+```
+
 ## Installation
 
 ```bash
@@ -51,10 +64,10 @@ A packet definition is a comma-separated list of `label:bits` pairs:
 
 ## Examples
 
-**ASCII (32-bit width, the default):**
+**ASCII:**
 
 ```bash
-proto "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
+proto "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
 ```
 
 Output:
@@ -67,14 +80,18 @@ Output:
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |            Length             |           Checksum            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Chunk                             |
++                                                               +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 :                             Data                              :
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
 
-**Unicode (32-bit width):**
+**Unicode:**
 
 ```bash
-proto --style unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Data:*"
+proto --style unicode "SourcePort:16,DestPort:16,Length:16,Checksum:16,Chunk:64,Data:*"
 ```
 
 Output:
@@ -87,6 +104,10 @@ Output:
 ├───────────────────────────────┼───────────────────────────────┤
 │            Length             │           Checksum            │
 ├───────────────────────────────┴───────────────────────────────┤
+│                             Chunk                             │
+├                                                               ┤
+│                                                               │
+├───────────────────────────────────────────────────────────────┤
 ┊                             Data                              ┊
 ╰───────────────────────────────────────────────────────────────╯
 ```
@@ -119,6 +140,10 @@ Output:
 ```
 Available Protocols:
 
+Layer 4 (Network):
+  ip    Internet Protocol Version 4
+
+Layer 4 (Transport):
   udp    User Datagram Protocol
   tcp    Transmission Control Protocol
 ```
